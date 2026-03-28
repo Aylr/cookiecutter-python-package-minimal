@@ -47,14 +47,20 @@ github: ## Open the GitHub repo for this project
 install: ## update your python environment
 	pip install -r requirements.txt || true
 	pip install -r dev-requirements.txt || true
+	mypy {{cookiecutter.module_name}} --install-types --non-interactive || true
+	mypy {{cookiecutter.module_name}} --install-types --non-interactive || true
 	pip install -e . || true
 	pip list
 
 test: ## Run tests
 	pytest -s tests
 
+typecheck: ## Run type checking
+	mypy {{cookiecutter.module_name}}s
+
 lint: ## Lint the entire project using black
-	black . --exclude venv
+	black . --exclude .venv
+
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
@@ -86,8 +92,8 @@ release: dist ## Package and upload a release to Gemfury
 	python setup.py sdist upload -r fury
 
 venv: ## Create a new virtualenv in the repo root
-	rm -rf venv || true
-	virtualenv venv
+	rm -rf .venv || true
+	virtualenv .venv
 .PHONY: venv
 
 notebooks: ## Run juypter lab for your notebooks

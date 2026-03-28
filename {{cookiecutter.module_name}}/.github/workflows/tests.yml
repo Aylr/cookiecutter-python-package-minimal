@@ -1,0 +1,62 @@
+name: Tests
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+    - name: install dependencies
+      run: |
+        pip install black pytest
+    - name: lint code
+      run: black --check .
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+    - name: install pytest
+      run: pip install pytest
+    - name: install package
+      run: pip install -e .
+    - name: test
+      run: |
+        pytest -v tests/* --junitxml=test-reports/report.xml
+
+  type_check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+    - name: install dependencies
+      run: |
+        pip install -e .
+        pip install mypy
+        pip install mypy pandas-stubs
+    - name: type check
+      run: |
+        mypy --config-file pyproject.toml --install-types --non-interactive --junit-xml test-reports/type_checking.xml ./
